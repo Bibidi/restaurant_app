@@ -7,7 +7,6 @@ import 'package:restaurant_app/providers/product.dart';
 import 'package:restaurant_app/providers/restaurant.dart';
 import 'package:restaurant_app/providers/user.dart';
 import 'package:restaurant_app/screens/dashboard.dart';
-import 'package:restaurant_app/screens/home.dart';
 import 'package:restaurant_app/screens/login.dart';
 
 void main() async {
@@ -23,19 +22,19 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: AppProvider()),
+        ChangeNotifierProvider.value(value: RestaurantProvider.initialize()),
         ChangeNotifierProvider.value(value: UserProvider.initialize()),
         ChangeNotifierProvider.value(value: CategoryProvider.initialize()),
         ChangeNotifierProvider.value(value: ProductProvider.initialize()),
-        ChangeNotifierProvider.value(value: Restaurantprovider.initialize()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Restaurant App',
         theme: ThemeData(
           primarySwatch: Colors.red,
-          visualDensity: VisualDensity.adaptivePlatformDensity,
+          // visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        home: DashboardScreen(),
+        home: ScreenController(),
       ),
     );
   }
@@ -51,7 +50,9 @@ class ScreenController extends StatelessWidget {
       case Status.Authenticating:
         return LoginScreen();
       case Status.Authenticated:
-        return Home();
+        return DashboardScreen();
+      default:
+        return LoginScreen();
     }
   }
 }

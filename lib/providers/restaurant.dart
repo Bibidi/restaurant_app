@@ -2,17 +2,24 @@ import 'package:flutter/cupertino.dart';
 import 'package:restaurant_app/helpers/restaurant.dart';
 import 'package:restaurant_app/models/restaurant.dart';
 
-class Restaurantprovider with ChangeNotifier {
+class RestaurantProvider with ChangeNotifier {
   RestaurantServices _restaurantServices = RestaurantServices();
   List<RestaurantModel> restaurants = [];
   List<RestaurantModel> searchedRestaurants = [];
 
-  Restaurantprovider.initialize() {
-    loadRestaurants();
+  RestaurantModel restaurant;
+
+  RestaurantProvider.initialize() {
+    _loadRestaurants();
   }
 
-  loadRestaurants() async {
+  _loadRestaurants() async {
     restaurants = await _restaurantServices.getRestaurants();
+    notifyListeners();
+  }
+
+  loadSingleRestaurant({String restaurantId}) async {
+    restaurant = await _restaurantServices.getRestaurantById(id: restaurantId);
     notifyListeners();
   }
 

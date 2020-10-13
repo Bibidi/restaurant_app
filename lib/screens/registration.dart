@@ -3,8 +3,10 @@ import 'package:provider/provider.dart';
 import 'package:restaurant_app/helpers/screen_navigation.dart';
 import 'package:restaurant_app/helpers/style.dart';
 import 'package:restaurant_app/providers/user.dart';
+import 'package:restaurant_app/screens/dashboard.dart';
 import 'package:restaurant_app/screens/login.dart';
 import 'package:restaurant_app/widgets/custom_text.dart';
+import 'package:restaurant_app/widgets/loading.dart';
 
 class RegistrationScreen extends StatefulWidget {
   @override
@@ -21,7 +23,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     return Scaffold(
       key: _key,
       backgroundColor: white,
-      body: SingleChildScrollView(
+      body: authProvider.status == Status.Authenticating ? Loading() : SingleChildScrollView(
         child: Column(
           children: [
             SizedBox(
@@ -52,7 +54,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     controller: authProvider.name,
                     decoration: InputDecoration(
                       border: InputBorder.none,
-                      hintText: "Username",
+                      hintText: "Restaurant name",
                       icon: Icon(Icons.person),
                     ),
                   ),
@@ -114,6 +116,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   }
 
                   authProvider.clearController();
+                  changeScreenReplacement(context, DashboardScreen());
                 },
                 child: Container(
                   decoration: BoxDecoration(

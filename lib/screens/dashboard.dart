@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:restaurant_app/helpers/screen_navigation.dart';
 import 'package:restaurant_app/helpers/style.dart';
+import 'package:restaurant_app/providers/product.dart';
+import 'package:restaurant_app/providers/user.dart';
+import 'package:restaurant_app/screens/add_product.dart';
+import 'package:restaurant_app/screens/login.dart';
 import 'package:restaurant_app/widgets/custom_text.dart';
 import 'package:restaurant_app/widgets/small_floating_button.dart';
 import 'package:transparent_image/transparent_image.dart';
@@ -10,6 +16,8 @@ class DashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final productProvider = Provider.of<ProductProvider>(context);
+    final userProvider = Provider.of<UserProvider>(context);
 
     bool hasImage = false;
 
@@ -41,9 +49,19 @@ class DashboardScreen extends StatelessWidget {
               ),
             ),
             ListTile(
-              onTap: () {},
+              onTap: () {
+
+              },
               leading: Icon(Icons.home),
               title: CustomText(text: "Home",),
+            ),
+            ListTile(
+              onTap: () {
+                userProvider.signOut();
+                changeScreenReplacement(context, LoginScreen());
+              },
+              leading: Icon(Icons.exit_to_app),
+              title: CustomText(text: "Log out",),
             ),
           ],
         ),
@@ -257,12 +275,24 @@ class DashboardScreen extends StatelessWidget {
               ),
             ),
 
-
+            Column(
+              children: userProvider.products
+                  .map((item) => GestureDetector(
+                onTap: () {},
+                child: Container(),
+              )).toList(),
+            )
 
           ],
         ),
       ),
-
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: primary,
+        child: Icon(Icons.add),
+        onPressed: () {
+          changeScreen(context, AddProductScreen());
+        },
+      ),
     );
   }
 

@@ -13,6 +13,11 @@ class RestaurantServices {
         }
         return restaurants;
       });
+
+  Future getRestaurantById({String id})
+  => _firestore.collection(collection).doc(id).get().then((result) {
+    return RestaurantModel.fromSnapshot(result);
+  });
   
   Future<List<RestaurantModel>> searchRestaurant({String restaurantName}) {
     String searchKey = restaurantName[0].toUpperCase() + restaurantName.substring(1);

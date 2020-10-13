@@ -3,8 +3,10 @@ import 'package:provider/provider.dart';
 import 'package:restaurant_app/helpers/screen_navigation.dart';
 import 'package:restaurant_app/helpers/style.dart';
 import 'package:restaurant_app/providers/user.dart';
+import 'package:restaurant_app/screens/dashboard.dart';
 import 'package:restaurant_app/screens/registration.dart';
 import 'package:restaurant_app/widgets/custom_text.dart';
+import 'package:restaurant_app/widgets/loading.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -21,7 +23,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       key: _key,
       backgroundColor: white,
-      body: SingleChildScrollView(
+      body: authProvider.status == Status.Authenticating ? Loading() : SingleChildScrollView(
         child: Column(
           children: [
             SizedBox(
@@ -49,7 +51,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: TextFormField(
-                    // controller: ,
+                    controller: authProvider.email,
                     decoration: InputDecoration(
                       border: InputBorder.none,
                       hintText: "Email",
@@ -70,7 +72,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: TextFormField(
-                    // controller: ,
+                    controller: authProvider.password,
                     decoration: InputDecoration(
                         border: InputBorder.none,
                         hintText: "Password",
@@ -80,17 +82,18 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
             ),
+
             Padding(
-              padding: const EdgeInsets.all(10.0),
+              padding: const EdgeInsets.all(12.0),
               child: GestureDetector(
                 onTap: () async {
                   if (!await authProvider.signIn()) {
                     _key.currentState.showSnackBar(
-                      SnackBar(content: Text("Login failed!"))
-                    );
+                      SnackBar(content: Text("Login failed!")));
                     return;
                   }
                   authProvider.clearController();
+                  changeScreenReplacement(context, DashboardScreen());
                 },
                 child: Container(
                   decoration: BoxDecoration(

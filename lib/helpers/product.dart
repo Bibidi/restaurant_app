@@ -5,7 +5,11 @@ class ProductServices {
   String collection = "products";
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<List<ProductModel>> getproducts() async =>
+  Future createProduct({Map data}) async {
+    _firestore.collection(collection).doc(data['id']).set(data);
+  }
+
+  Future<List<ProductModel>> getProducts() async =>
       _firestore.collection(collection).get().then((result) {
         List<ProductModel> products = [];
         for (DocumentSnapshot product in result.docs) {

@@ -1,20 +1,32 @@
+import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:restaurant_app/helpers/product.dart';
 import 'package:restaurant_app/models/product.dart';
+import 'package:uuid/uuid.dart';
 
 class ProductProvider with ChangeNotifier {
   ProductServices _productServices = ProductServices();
   List<ProductModel> products = [];
   List<ProductModel> productsByCategory = [];
-  List<ProductModel> productsByRestaurant = [];
   List<ProductModel> searchedProducts = [];
+
+  TextEditingController name = TextEditingController();
+  TextEditingController description = TextEditingController();
+  TextEditingController price = TextEditingController();
+
+  bool featured = false;
+  final _picker = ImagePicker();
+  String productImageFileName;
+  File productImage;
 
   ProductProvider.initialize() {
     loadProducts();
   }
 
   loadProducts() async {
-    products = await _productServices.getproducts();
+    products = await _productServices.getProducts();
     notifyListeners();
   }
 
@@ -23,13 +35,60 @@ class ProductProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future loadProductsByRestaurant({String restaurantId}) async {
-    productsByRestaurant = await _productServices.getProductsByRestaurant(id: restaurantId);
-    notifyListeners();
+  Future<bool> uploadProduct({String category, String restaurant, String restaurantId}) async {
+    try{
+      String id = Uuid().v1();
+      String imageUrl = await _uploadImageFile(imageFile: productImage, imageFileName: id);
+      Map<String, dynamic> data = {
+        "id": id,
+        "name": name.text.trim(),
+        "image": imageUrl,
+        "rates": 0,
+        "rating": 0.0,
+        "price": double.parse(price.text.trim()),
+        "restaurant": restaurant,
+        "restaurantId": restaurantId,
+        "description": description.text.trim(),
+        "featured": featured,
+      };
+      _productServices.createProduct(data: data);
+      return true;
+    } catch(e) {
+      print(e.toString());
+      return false;
+    }
+  }
+
+  clear() {
+    productImage = null;
+    productImageFileName = null;
+    name.text = "";
+    description.text ="";
+    price.text = "";
+    featured = false;
   }
 
   Future search({String productName}) async {
     searchedProducts = await _productServices.searchProducts(productName: productName);
     notifyListeners();
+  }
+
+  changeFeatured() {
+    featured = !featured;
+    notifyListeners();
+  }
+
+   getImageFile({ImageSource source}) async {
+    final pickedFile = await _picker.getImage(source: source, maxWidth: 640, maxHeight: 400);
+    productImage = File(pickedFile.path);
+    productImageFileName =  productImage.path.substring(productImage.path.indexOf('/') + 1);
+    notifyListeners();
+   }
+
+  Future<String> _uploadImageFile({File imageFile, String imageFileName}) async {
+    StorageReference reference = FirebaseStorage.instance.ref().child(imageFileName);
+    StorageUploadTask uploadTask = reference.putFile(imageFile);
+    String imageUrl = await (await uploadTask.onComplete).ref.getDownloadURL();
+    return imageUrl;
   }
 }
