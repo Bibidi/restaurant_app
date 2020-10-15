@@ -296,9 +296,11 @@ class _AddProductScreenState extends State<AddProductScreen> {
                     }
                     productProvider.clear();
                     _key.currentState.showSnackBar(SnackBar(
-                      content: Text("Upload compledted"),
+                      content: Text("Upload completed"),
                       duration: const Duration(seconds: 10),
                     ));
+                    userProvider.loadProductsByRestaurant(restaurantId: userProvider.restaurant.id);
+                    await userProvider.reload();
                     appProvider.changeLoading();
                 },
                   child: CustomText(

@@ -6,7 +6,10 @@ import 'package:restaurant_app/providers/product.dart';
 import 'package:restaurant_app/providers/user.dart';
 import 'package:restaurant_app/screens/add_product.dart';
 import 'package:restaurant_app/screens/login.dart';
+import 'package:restaurant_app/screens/orders.dart';
+import 'package:restaurant_app/screens/products.dart';
 import 'package:restaurant_app/widgets/custom_text.dart';
+import 'package:restaurant_app/widgets/product.dart';
 import 'package:restaurant_app/widgets/small_floating_button.dart';
 import 'package:transparent_image/transparent_image.dart';
 
@@ -19,7 +22,7 @@ class DashboardScreen extends StatelessWidget {
     final productProvider = Provider.of<ProductProvider>(context);
     final userProvider = Provider.of<UserProvider>(context);
 
-    bool hasImage = false;
+    bool hasImage = true;
 
     return Scaffold(
       appBar: AppBar(
@@ -27,24 +30,28 @@ class DashboardScreen extends StatelessWidget {
         elevation: 0.5,
         backgroundColor: primary,
         title: CustomText(
-          text: "Sales: \$12.99",
+          text: "Sales: \$${userProvider.totalSales}",
           color: white,
         ),
         actions: [],
       ),
       drawer: Drawer(
+
         child: ListView(
           children: [
             UserAccountsDrawerHeader(
+              decoration: BoxDecoration(
+                color: primary,
+              ),
               accountName: CustomText(
-                text: "Santos Corner",
+                text: userProvider.restaurant.name,
                 color: white,
                 weight: FontWeight.bold,
                 size: 18,
               ),
 
               accountEmail: CustomText(
-                text: "admin@admin.com",
+                text: userProvider.user.email,
                 color: white,
               ),
             ),
@@ -54,6 +61,27 @@ class DashboardScreen extends StatelessWidget {
               },
               leading: Icon(Icons.home),
               title: CustomText(text: "Home",),
+            ),
+            ListTile(
+              onTap: () {
+
+              },
+              leading: Icon(Icons.restaurant),
+              title: CustomText(text: "My restaurant",),
+            ),
+            ListTile(
+              onTap: () {
+                changeScreen(context, OrdersScreen());
+              },
+              leading: Icon(Icons.bookmark_border),
+              title: CustomText(text: "Orders",),
+            ),
+            ListTile(
+              onTap: () {
+                changeScreen(context, ProductsScreen());
+              },
+              leading: Icon(Icons.fastfood),
+              title: CustomText(text: "Products",),
             ),
             ListTile(
               onTap: () {
@@ -79,7 +107,7 @@ class DashboardScreen extends StatelessWidget {
                     bottomLeft: Radius.circular(2),
                     bottomRight: Radius.circular(2),
                   ),
-                  child: imageWidget(hasImage: hasImage),
+                  child: imageWidget(hasImage: hasImage, url: userProvider.restaurant.image),
                 ),
 
                 // fading black
@@ -113,7 +141,7 @@ class DashboardScreen extends StatelessWidget {
                   child: Align(
                     alignment: Alignment.bottomLeft,
                     child: CustomText(
-                      text: 'Santos Corner',
+                      text: userProvider.restaurant.name,
                       color: white,
                       size: 24,
                       weight: FontWeight.normal,
@@ -127,7 +155,7 @@ class DashboardScreen extends StatelessWidget {
                   child: Align(
                     alignment: Alignment.bottomLeft,
                     child: CustomText(
-                      text: "Average Price: \$5.5",
+                      text: "Average Price: \$${userProvider.avgPrice.toStringAsFixed(2)}",
                       color: white,
                       size: 16,
                       weight: FontWeight.w300,
@@ -150,7 +178,9 @@ class DashboardScreen extends StatelessWidget {
                             color: black.withOpacity(0.3),
                           ),
                           child: FlatButton.icon(
-                              onPressed: () {},
+                              onPressed: () {
+
+                              },
                               icon: Icon(Icons.edit, color: white,),
                               label: CustomText(
                                 text: "Edit",
@@ -185,7 +215,7 @@ class DashboardScreen extends StatelessWidget {
                                 size: 20,
                               ),
                             ),
-                            Text("4.5"),
+                            Text("${(userProvider.restaurantRating).toStringAsFixed(1)}"),
                           ],
                         ),
                       ),
@@ -212,7 +242,7 @@ class DashboardScreen extends StatelessWidget {
             ),
 
             Padding(
-              padding: const EdgeInsets.all(4.0),
+              padding: const EdgeInsets.all(8.0),
               child: Container(
                 decoration: BoxDecoration(
                   color: white,
@@ -226,6 +256,9 @@ class DashboardScreen extends StatelessWidget {
                   ]
                 ),
                 child: ListTile(
+                  onTap: () {
+                    changeScreen(context, OrdersScreen());
+                  },
                   leading: Padding(
                     padding: const EdgeInsets.all(4.0),
                     child: Image.asset("images/delivery.png"),
@@ -235,7 +268,7 @@ class DashboardScreen extends StatelessWidget {
                     size: 24,
                   ),
                   trailing: CustomText(
-                    text: "30",
+                    text: userProvider.orders.length.toString(),
                     size: 24,
                     weight: FontWeight.bold,
                   ),
@@ -244,7 +277,7 @@ class DashboardScreen extends StatelessWidget {
             ),
 
             Padding(
-              padding: const EdgeInsets.all(4.0),
+              padding: const EdgeInsets.all(8.0),
               child: Container(
                 decoration: BoxDecoration(
                     color: white,
@@ -258,40 +291,27 @@ class DashboardScreen extends StatelessWidget {
                     ]
                 ),
                 child: ListTile(
+                  onTap: () {
+                    changeScreen(context, ProductsScreen());
+                  },
                   leading: Padding(
                     padding: const EdgeInsets.all(4.0),
                     child: Image.asset("images/fd.png"),
                   ),
                   title: CustomText(
-                    text: "Total Food",
+                    text: "Products",
                     size: 24,
                   ),
                   trailing: CustomText(
-                    text: "30",
+                    text: userProvider.products.length.toString(),
                     size: 24,
                     weight: FontWeight.bold,
                   ),
                 ),
               ),
             ),
-
-            Column(
-              children: userProvider.products
-                  .map((item) => GestureDetector(
-                onTap: () {},
-                child: Container(),
-              )).toList(),
-            )
-
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: primary,
-        child: Icon(Icons.add),
-        onPressed: () {
-          changeScreen(context, AddProductScreen());
-        },
       ),
     );
   }

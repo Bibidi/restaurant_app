@@ -17,8 +17,8 @@ class OrderServices {
     });
   }
 
-  Future<List<OrderModel>> getUserOrders({String userId}) async =>
-      _firestore.collection(collection).where("userId", isEqualTo: userId).get().then((result) {
+  Future<List<OrderModel>> getRestaurantOrders({String restaurantId}) async =>
+      _firestore.collection(collection).where("restaurantIds", arrayContains: restaurantId).get().then((result) {
         List<OrderModel> orders = [];
         for (DocumentSnapshot order in result.docs) {
           orders.add(OrderModel.fromSnapshot(order));
